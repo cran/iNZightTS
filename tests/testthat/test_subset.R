@@ -54,12 +54,20 @@ test_that("Subset of forecast plot", {
 tm <- iNZightTS(visitorsQ, var = 2:5)
 test_that("Subset of multi series graph works", {
     p <- plot(tm, xlim = c(2000, 2011))
-    expect_is(p, "gtable")
+    expect_is(p, "patchwork")
 
 
     ## non-compare version
     expect_silent(p <- plot(tm, compare = FALSE, xlim = c(2000, 2011)))
     expect_is(p, "gtable")
+})
+
+## covid data
+test_that("Modelling limits are OK", {
+    ct <- iNZightTS(covid, time.var = 6, var = 5)
+
+    expect_is(plot(ct, xlim = c(10, 20)), "ggplot")
+    expect_is(plot(ct), "ggplot")
 })
 
 unlink("Rplots.pdf")

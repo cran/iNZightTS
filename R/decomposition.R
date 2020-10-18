@@ -41,11 +41,12 @@ decompose <- function(obj, multiplicative = FALSE, t = 10, model.lim = NULL,
 
     n <- length(obj$data)
 
+    if (multiplicative)
+        tsObj <- log(obj$tsObj)
+    else
+        tsObj <- obj$tsObj
+
     if (obj$freq > 1) {
-        if (multiplicative)
-            tsObj <- log(obj$tsObj)
-        else
-            tsObj <- obj$tsObj
         ### t.window is the smallest odd integer ranges from about 1.5*frequceny to 2*frequency
         ### the actual minimum value is  1.5 * frequency/(1 - 1.5/s.window)
         ### where s.window = 10* number of observation +1 by putting 'periodic'
@@ -104,6 +105,7 @@ decompose <- function(obj, multiplicative = FALSE, t = 10, model.lim = NULL,
                 )
             )
         }
+        tsp(decomp$time.series) <- c(obj$start[1], obj$end[1], obj$freq)
     }
 
     decompData <- decomp$time.series    # returns matrix
@@ -146,6 +148,7 @@ decompose <- function(obj, multiplicative = FALSE, t = 10, model.lim = NULL,
 #'
 #' @describeIn decompose Plot a time series decomposition
 #' @export
+#' @import patchwork
 plot.inzdecomp <- function(x, recompose.progress = c(0, 0),
                            recompose = any(recompose.progress > 0),
                            ylab = x$currVar, xlab = "Date",
@@ -171,6 +174,10 @@ plot.inzdecomp <- function(x, recompose.progress = c(0, 0),
         )
     }
     td <- dplyr::filter(td, dplyr::between(td$Date, xlim[1], xlim[2]))
+
+    if (recompose && all(recompose.progress == 0)) {
+        recompose.progress <- c(1, nrow(td))
+    }
 
 
     ## Create ONE SINGLE plot
@@ -216,6 +223,7 @@ plot.inzdecomp <- function(x, recompose.progress = c(0, 0),
         )
     }
 
+    lcolour <- colorspace::lighten(colour, 0.5)
     FINAL <- all(recompose.progress == c(1L, nrow(td)))
     pdata <- p0 +
         geom_path(aes_(y = ~value), colour = "gray") +
@@ -224,17 +232,38 @@ plot.inzdecomp <- function(x, recompose.progress = c(0, 0),
             colour = colour[1],
             alpha = ifelse(FINAL, 0.5, 1)
         ) +
+        # Observed data = trend + seasonal swing + residuals
         labs(
             title = title,
             y = ylab,
-            subtitle = sprintf("Trend%s%s%s",
-                ifelse(sum(recompose.progress) > 0, " + seasonal swing", ""),
-                ifelse(recompose.progress[1] > 0, " + residuals", ""),
-                ifelse(FINAL, " = observed data", "")
+            subtitle = sprintf(
+                "%s = %s + %s + %s",
+                ifelse(FINAL,
+                    "<span style='color:black'>Observed data</span>",
+                    "<span style='color:gray'>Observed data</span>"
+                ),
+                ifelse(sum(recompose.progress) == 0,
+                    glue::glue("<span style='color:{colour[1]}'>**Trend**</span>"),
+                    glue::glue("<span style='color:{colour[1]}'>Trend</span>")
+                ),
+                ifelse(sum(recompose.progress) == 0,
+                    glue::glue("<span style='color:{lcolour[2]}'>seasonal swing</span>"),
+                    ifelse(recompose.progress[1] == 0,
+                        glue::glue("<span style='color:{colour[2]}'>**seasonal swing**</span>"),
+                        glue::glue("<span style='color:{colour[2]}'>seasonal swing</span>")
+                    )
+                ),
+                ifelse(recompose.progress[1] == 0,
+                    glue::glue("<span style='color:{lcolour[3]}'>residuals</span>"),
+                    ifelse(!FINAL,
+                        glue::glue("<span style='color:{colour[3]}'>**residuals**</span>"),
+                        glue::glue("<span style='color:{colour[3]}'>residuals</span>")
+                    )
+                )
             )
         ) +
         ylim(extendrange(datarange, f = 0.05))
-    if (recompose && any(recompose > 0)) {
+    if (recompose && any(recompose.progress > 0)) {
         ri <- ifelse(recompose.progress[1] == 0,
             recompose.progress[2],
             nrow(td)
@@ -263,24 +292,15 @@ plot.inzdecomp <- function(x, recompose.progress = c(0, 0),
                             .data$residual
                     )
                 )
+            if (!FINAL)
+                pdata <- pdata +
+                    geom_path(
+                        aes_(y = ~z),
+                        data = rtd[-(1:(ri-1)),],
+                        colour = colour[3]
+                    )
+
             pdata <- pdata +
-                # geom_path(
-                #     aes(y = ~trend),
-                #     data = rtd[1:ri, ]
-                # ) +
-                geom_path(
-                    aes_(y = ~z),
-                    data = rtd[-(1:(ri-1)),],
-                    colour = colour[3]
-                ) +
-                # geom_segment(
-                #     aes_(
-                #         y = ~value, yend = ~value - residual,
-                #         xend = ~Date
-                #     ),
-                #     data = rtd[1:ri,],
-                #     colour = colour[3]
-                # ) +
                 geom_path(
                     aes_(y = ~value),
                     data = rtd[1:ri,],
@@ -288,6 +308,12 @@ plot.inzdecomp <- function(x, recompose.progress = c(0, 0),
                 )
         }
     }
+
+    pdata <- pdata +
+        theme(
+            plot.title.position = "plot",
+            plot.subtitle = ggtext::element_markdown()
+        )
 
     pseason <- p0 +
         geom_path(aes_(y = ~seasonal), colour = colour[2]) +
@@ -310,12 +336,12 @@ plot.inzdecomp <- function(x, recompose.progress = c(0, 0),
             panel.grid.minor.y = element_blank()
         )
 
+    pfinal <- pdata + pseason + presid +
+        plot_layout(ncol = 1, heights = ratios)
+
     dev.hold()
     on.exit(dev.flush())
-    egg::ggarrange(
-        pdata, pseason, presid,
-        heights = ratios
-    )
+    print(pfinal)
 
     invisible(x)
 }
