@@ -1,13 +1,13 @@
 Package: iNZightTS
 Type: Package
 Title: Time Series for 'iNZight'
-Version: 1.5.8
+Version: 1.5.9
 Authors@R: c(
     person("Tom", "Elliott", role = c("aut", "cre"), email = "tom.elliott@auckland.ac.nz", comment = c(ORCID = "0000-0002-7815-6318")),
-    person("Junjie", "Zeng",    role = "aut"),
+    person("Junjie", "Zeng",    role = "ctb"),
     person("Simon", "Potter",   role = "aut"),
     person("David", "Banks",    role = "aut"),
-    person("Marco", "Kuper",    role = "aut"),
+    person("Marco", "Kuper",    role = "ctb"),
     person("Dongning", "Zhang", role = "ctb")
     )
 Depends: R (>= 3.2)
@@ -23,15 +23,15 @@ LazyData: true
 License: GPL-3
 Encoding: UTF-8
 Language: en-GB
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 NeedsCompilation: no
-Packaged: 2021-05-20 23:42:11 UTC; tom
+Packaged: 2022-01-31 21:41:09 UTC; tom
 Author: Tom Elliott [aut, cre] (<https://orcid.org/0000-0002-7815-6318>),
-  Junjie Zeng [aut],
+  Junjie Zeng [ctb],
   Simon Potter [aut],
   David Banks [aut],
-  Marco Kuper [aut],
+  Marco Kuper [ctb],
   Dongning Zhang [ctb]
 Maintainer: Tom Elliott <tom.elliott@auckland.ac.nz>
 Repository: CRAN
-Date/Publication: 2021-05-21 04:20:02 UTC
+Date/Publication: 2022-01-31 21:50:02 UTC
