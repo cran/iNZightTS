@@ -1,7 +1,7 @@
 Package: iNZightTS
 Type: Package
 Title: Time Series for 'iNZight'
-Version: 2.0.0
+Version: 2.0.2
 Authors@R: c(
     person("Tom", "Elliott", role = c("aut", "cre"), email = "tom.elliott@auckland.ac.nz", comment = c(ORCID = "0000-0002-7815-6318")),
     person("Zhaoming", "Su",    role = "aut"),
@@ -11,7 +11,7 @@ Authors@R: c(
     person("Marco", "Kuper",    role = "ctb"),
     person("Dongning", "Zhang", role = "ctb")
     )
-Depends: R (>= 3.2)
+Depends: R (>= 4.1)
 Imports: colorspace, dplyr (>= 1.1.0), forcats, ggplot2, ggtext, glue,
         graphics, grDevices, grid, patchwork, rlang, stats, tidyr,
         utils, tsibble, fable, fabletools, feasts, evaluate, lubridate,
@@ -25,10 +25,13 @@ LazyData: true
 License: GPL-3
 Encoding: UTF-8
 Language: en-GB
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
+Config/testthat/edition: 3
+Config/Needs/dependencies: rcmdcheck, curl
+Config/Needs/coverage: covr
 NeedsCompilation: no
-Packaged: 2024-01-17 01:22:27 UTC; tom
-Author: Tom Elliott [aut, cre] (<https://orcid.org/0000-0002-7815-6318>),
+Packaged: 2025-07-02 23:25:09 UTC; tom
+Author: Tom Elliott [aut, cre] (ORCID: <https://orcid.org/0000-0002-7815-6318>),
   Zhaoming Su [aut],
   Junjie Zeng [ctb],
   Simon Potter [ctb],
@@ -37,4 +40,4 @@ Author: Tom Elliott [aut, cre] (<https://orcid.org/0000-0002-7815-6318>),
   Dongning Zhang [ctb]
 Maintainer: Tom Elliott <tom.elliott@auckland.ac.nz>
 Repository: CRAN
-Date/Publication: 2024-01-17 06:20:02 UTC
+Date/Publication: 2025-07-03 04:00:02 UTC
