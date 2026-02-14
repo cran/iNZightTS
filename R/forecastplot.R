@@ -227,7 +227,7 @@ predict_inzightts_var <- function(x, var, h, mult_fit, pred_model, confint_width
             .model = "Fitted"
         )) |>
         dplyr::bind_rows(dplyr::mutate(
-            dplyr::select(dplyr::rename(x, .mean = !!var), .mean),
+            dplyr::select(dplyr::rename(x, .mean = !!var), index, .mean),
             .model = "Raw data"
         )) |>
         dplyr::mutate(.var = !!as.character(var)) |>
@@ -374,7 +374,7 @@ plot_forecast_var <- function(x, var, xlab, ylab, title) {
     p <- x |>
         dplyr::select(-.var) |>
         dplyr::filter(.model != "Raw data") |>
-        fabletools::autoplot(.mean, linetype = ifelse(n_keys > 3, "dashed", "solid"))
+        ggtime::autoplot(.mean, linetype = ifelse(n_keys > 3, "dashed", "solid"))
     if (n_keys > 3) {
         p$mapping$group <- p$mapping$colour
         p$mapping$colour <- NULL
